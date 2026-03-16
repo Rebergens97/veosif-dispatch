@@ -24,7 +24,7 @@ services:
     environment:
       SOCKETCLUSTER_WORKERS: 4
       SOCKETCLUSTER_BROKERS: 2
-      SOCKETCLUSTER_OPTIONS: '{"origins":"https://YOURDOMAIN.com:*,wss://YOURDOMAIN.com:*,https://www.YOURDOMAIN.com:*,wss://www.YOURDOMAIN.com:*"}'
+      SOCKETCLUSTER_OPTIONS: '{"origins":"https://veosifwork.com:*,wss://veosifwork.com:*,https://www.veosifwork.com:*,wss://www.veosifwork.com:*"}'
 
   # ---------------------------------------------------
   # Laravel Application
@@ -42,9 +42,9 @@ services:
       CACHE_PATH: /fleetbase/api/storage/framework/cache
       CACHE_URL: "tls://:${REDIS_PASSWORD}@${REDIS_HOST}:25061"
       REDIS_URL: "tls://:${REDIS_PASSWORD}@${REDIS_HOST}:25061"
-      SESSION_DOMAIN: .YOURDOMAIN.com
+      SESSION_DOMAIN: .veosifwork.com
       BROADCAST_DRIVER: socketcluster
-      CONSOLE_HOST: https://YOURDOMAIN.com
+      CONSOLE_HOST: https://veosifwork.com
       MAIL_FROM_NAME: Fleetbase
       APP_NAME: Fleetbase
       LOG_CHANNEL: daily

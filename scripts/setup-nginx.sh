@@ -23,7 +23,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 header "KONFIGIRE NGINX POU $DOMAIN"
 
-# ---- Substitye YOURDOMAIN.com ak domèn reyèl la ----
+# ---- Substitye veosifwork.com ak domèn reyèl la ----
 setup_conf() {
     local template="$1"
     local dest="$2"

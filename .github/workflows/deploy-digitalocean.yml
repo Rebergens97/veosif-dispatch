@@ -1,0 +1,146 @@
+name: Deploy to Digital Ocean
+
+# =============================================================================
+# Trigger: Push sou branch "main" → deplwaye pwodiksyon otomatikman
+# =============================================================================
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Pèmèt deplwaman manyèl depi GitHub UI
+
+jobs:
+  # ============================================================
+  # JOB 1: Build Console (Frontend Ember.js)
+  # ============================================================
+  build-console:
+    name: Build Frontend (Ember.js)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code (avèk submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install pnpm
+        run: npm install -g pnpm ember-cli
+
+      - name: Install Console Dependencies
+        working-directory: ./console
+        run: pnpm install
+
+      - name: Build Console (Production)
+        working-directory: ./console
+        run: pnpm build --environment production
+        env:
+          API_HOST: ${{ secrets.API_HOST }}
+          SOCKETCLUSTER_HOST: ${{ secrets.SOCKETCLUSTER_HOST }}
+
+      - name: Upload Console Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: console-dist
+          path: console/dist/
+          retention-days: 1
+
+  # ============================================================
+  # JOB 2: Deploy sou Digital Ocean (via SSH)
+  # ============================================================
+  deploy:
+    name: Deploy to Digital Ocean Droplet
+    runs-on: ubuntu-latest
+    needs: build-console  # Tann build fini avan deplwaman
+
+    steps:
+      - name: Checkout Code (avèk submodules)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Download Console Build
+        uses: actions/download-artifact@v4
+        with:
+          name: console-dist
+          path: console/dist/
+
+      - name: Deploy via SSH to Digital Ocean
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          port: 22
+          script_stop: true
+          script: |
+            set -e
+            echo "🚀 Kòmanse deplwaman Fleetbase..."
+
+            # ---- Ale nan dosye pwojè a ----
+            cd /opt/fleetbase
+
+            # ---- Pull dènye chanjman yo ----
+            echo "📥 Pull latest code..."
+            git pull origin main
+            git submodule update --init --recursive
+
+            # ---- Asire .env la egziste ----
+            if [ ! -f api/.env ]; then
+              echo "❌ ERÈ: api/.env pa egziste sou sèvè a!"
+              echo "Kouri: cp api/.env.example api/.env epi ranpli valè yo"
+              exit 1
+            fi
+
+            # ---- Build ak Deplwaye Docker ----
+            echo "🐳 Building Docker images..."
+            docker compose -f docker-compose.yml -f docker-compose.production.yml build --no-cache console httpd
+
+            echo "⬆️ Starting services..."
+            docker compose -f docker-compose.yml -f docker-compose.production.yml up -d
+
+            # ---- Tann application la kòmanse ----
+            echo "⏳ Waiting for application to start..."
+            sleep 15
+
+            # ---- Kouri Migrations ak Setup ----
+            echo "🗄️ Running database migrations..."
+            docker compose exec -T application php artisan migrate --force
+
+            echo "🌱 Seeding database..."
+            docker compose exec -T application php artisan fleetbase:seed || true
+
+            echo "🔑 Creating permissions..."
+            docker compose exec -T application php artisan fleetbase:create-permissions || true
+
+            echo "🔄 Restarting queue..."
+            docker compose exec -T application php artisan queue:restart
+
+            echo "⚡ Optimizing..."
+            docker compose exec -T application php artisan cache:clear
+            docker compose exec -T application php artisan config:cache
+            docker compose exec -T application php artisan route:cache
+
+            echo "🧹 Cleaning up old Docker images..."
+            docker image prune -f
+
+            echo ""
+            echo "✅ Deplwaman fini avèk siksè!"
+            echo "   Console:  https://${{ secrets.DOMAIN }}"
+            echo "   API:      https://api.${{ secrets.DOMAIN }}"
+
+      - name: Notify Deployment Success
+        if: success()
+        run: |
+          echo "✅ Fleetbase deplwaye avèk siksè sou ${{ secrets.DOMAIN }}"
+
+      - name: Notify Deployment Failure
+        if: failure()
+        run: |
+          echo "❌ Deplwaman echwe! Tcheke logs yo."

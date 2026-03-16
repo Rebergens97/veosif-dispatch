@@ -1,0 +1,118 @@
+# Production Docker Compose Override for Digital Ocean
+# Usage: docker compose -f docker-compose.yml -f docker-compose.production.yml up -d
+
+services:
+  # ---------------------------------------------------
+  # Remove local database - use DO Managed MySQL instead
+  # ---------------------------------------------------
+  database:
+    profiles:
+      - donotstart
+
+  # ---------------------------------------------------
+  # Remove local redis - use DO Managed Redis instead
+  # ---------------------------------------------------
+  cache:
+    profiles:
+      - donotstart
+
+  # ---------------------------------------------------
+  # SocketCluster - WebSocket server (production)
+  # ---------------------------------------------------
+  socket:
+    restart: always
+    environment:
+      SOCKETCLUSTER_WORKERS: 4
+      SOCKETCLUSTER_BROKERS: 2
+      SOCKETCLUSTER_OPTIONS: '{"origins":"https://YOURDOMAIN.com:*,wss://YOURDOMAIN.com:*,https://www.YOURDOMAIN.com:*,wss://www.YOURDOMAIN.com:*"}'
+
+  # ---------------------------------------------------
+  # Laravel Application
+  # ---------------------------------------------------
+  application:
+    restart: always
+    volumes:
+      - ./api/.env:/fleetbase/api/.env
+      - fleetbase_storage:/fleetbase/api/storage
+    environment:
+      ENVIRONMENT: production
+      DATABASE_URL: "mysql://fleetbase:${DB_PASSWORD}@${DB_HOST}:25060/fleetbase?sslMode=require"
+      QUEUE_CONNECTION: redis
+      CACHE_DRIVER: redis
+      CACHE_PATH: /fleetbase/api/storage/framework/cache
+      CACHE_URL: "tls://:${REDIS_PASSWORD}@${REDIS_HOST}:25061"
+      REDIS_URL: "tls://:${REDIS_PASSWORD}@${REDIS_HOST}:25061"
+      SESSION_DOMAIN: .YOURDOMAIN.com
+      BROADCAST_DRIVER: socketcluster
+      CONSOLE_HOST: https://YOURDOMAIN.com
+      MAIL_FROM_NAME: Fleetbase
+      APP_NAME: Fleetbase
+      LOG_CHANNEL: daily
+      REGISTRY_HOST: https://registry.fleetbase.io
+      REGISTRY_PREINSTALLED_EXTENSIONS: "true"
+      OSRM_HOST: https://router.project-osrm.org
+      APP_ENV: production
+      APP_DEBUG: "false"
+    depends_on: []
+
+  # ---------------------------------------------------
+  # Laravel Scheduler
+  # ---------------------------------------------------
+  scheduler:
+    restart: always
+    volumes:
+      - ./api/.env:/fleetbase/api/.env
+      - fleetbase_storage:/fleetbase/api/storage
+    environment:
+      DATABASE_URL: "mysql://fleetbase:${DB_PASSWORD}@${DB_HOST}:25060/fleetbase?sslMode=require"
+      QUEUE_CONNECTION: redis
+      CACHE_DRIVER: redis
+      CACHE_PATH: /fleetbase/api/storage/framework/cache
+      CACHE_URL: "tls://:${REDIS_PASSWORD}@${REDIS_HOST}:25061"
+      REDIS_URL: "tls://:${REDIS_PASSWORD}@${REDIS_HOST}:25061"
+    depends_on: []
+
+  # ---------------------------------------------------
+  # Laravel Queue Worker
+  # ---------------------------------------------------
+  queue:
+    restart: always
+    volumes:
+      - ./api/.env:/fleetbase/api/.env
+      - fleetbase_storage:/fleetbase/api/storage
+    environment:
+      DATABASE_URL: "mysql://fleetbase:${DB_PASSWORD}@${DB_HOST}:25060/fleetbase?sslMode=require"
+      QUEUE_CONNECTION: redis
+      CACHE_DRIVER: redis
+      CACHE_PATH: /fleetbase/api/storage/framework/cache
+      CACHE_URL: "tls://:${REDIS_PASSWORD}@${REDIS_HOST}:25061"
+      REDIS_URL: "tls://:${REDIS_PASSWORD}@${REDIS_HOST}:25061"
+    depends_on: []
+
+  # ---------------------------------------------------
+  # Ember.js Console (Frontend) - Production build
+  # ---------------------------------------------------
+  console:
+    build:
+      context: ./console
+      dockerfile: Dockerfile
+      args:
+        ENVIRONMENT: production
+    restart: always
+    ports:
+      - "4200:4200"
+
+  # ---------------------------------------------------
+  # Nginx Reverse Proxy (API)
+  # ---------------------------------------------------
+  httpd:
+    restart: always
+    ports:
+      - "8000:80"
+
+# ---------------------------------------------------
+# Volumes persistans
+# ---------------------------------------------------
+volumes:
+  fleetbase_storage:
+    driver: local

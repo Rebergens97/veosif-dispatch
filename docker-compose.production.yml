@@ -45,8 +45,8 @@ services:
       SESSION_DOMAIN: .veosifwork.com
       BROADCAST_DRIVER: socketcluster
       CONSOLE_HOST: https://veosifwork.com
-      MAIL_FROM_NAME: Fleetbase
-      APP_NAME: Fleetbase
+      MAIL_FROM_NAME: "Veosif Dispatch"
+      APP_NAME: "Veosif Dispatch"
       LOG_CHANNEL: daily
       REGISTRY_HOST: https://registry.fleetbase.io
       REGISTRY_PREINSTALLED_EXTENSIONS: "true"

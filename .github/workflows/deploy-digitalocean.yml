@@ -42,6 +42,8 @@ jobs:
         env:
           API_HOST: ${{ secrets.API_HOST }}
           SOCKETCLUSTER_HOST: ${{ secrets.SOCKETCLUSTER_HOST }}
+          SOCKETCLUSTER_PORT: "443"
+          SOCKETCLUSTER_SECURE: "true"
 
       - name: Upload Console Build Artifact
         uses: actions/upload-artifact@v4
@@ -100,7 +102,7 @@ jobs:
 
             # ---- Build ak Deplwaye Docker ----
             echo "🐳 Building Docker images..."
-            docker compose -f docker-compose.yml -f docker-compose.production.yml build --no-cache console httpd
+            docker compose -f docker-compose.yml -f docker-compose.production.yml build console httpd
 
             echo "⬆️ Starting services..."
             docker compose -f docker-compose.yml -f docker-compose.production.yml up -d
@@ -114,10 +116,10 @@ jobs:
             docker compose exec -T application php artisan migrate --force
 
             echo "🌱 Seeding database..."
-            docker compose exec -T application php artisan fleetbase:seed || true
+            docker compose exec -T application php artisan fleetbase:seed 2>/dev/null || true
 
             echo "🔑 Creating permissions..."
-            docker compose exec -T application php artisan fleetbase:create-permissions || true
+            docker compose exec -T application php artisan fleetbase:create-permissions 2>/dev/null || true
 
             echo "🔄 Restarting queue..."
             docker compose exec -T application php artisan queue:restart

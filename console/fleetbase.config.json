@@ -1,3 +1,9 @@
 {
-    "API_HOST": "http://localhost:8000"
+  "API_HOST": "https://api.veosifwork.com",
+  "API_NAMESPACE": "int/v1",
+  "API_SECURE": true,
+  "SOCKETCLUSTER_HOST": "socket.veosifwork.com",
+  "SOCKETCLUSTER_PORT": 443,
+  "SOCKETCLUSTER_SECURE": true,
+  "SOCKETCLUSTER_PATH": "/socketcluster/"
 }

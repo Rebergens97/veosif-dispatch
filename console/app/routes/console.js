@@ -25,7 +25,17 @@ export default class ConsoleRoute extends Route {
         this.hookService.execute('console:before-model', this.session, this.router, transition);
 
         if (this.session.isAuthenticated) {
-            return this.session.promiseCurrentUser(transition);
+            await this.session.promiseCurrentUser(transition);
+
+            // Redirect to setup wizard if workspace onboarding is not completed
+            try {
+                const user = this.currentUser?.user;
+                if (user && user.company_onboarding_completed === false) {
+                    return this.router.transitionTo('setup');
+                }
+            } catch (e) {
+                // Silently continue to console if check fails
+            }
         }
     }
 

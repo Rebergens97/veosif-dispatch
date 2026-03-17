@@ -12,6 +12,7 @@ Router.map(function () {
     this.route('onboard', function () {
         this.route('verify-email');
     });
+    this.route('setup');
     this.route('auth', function () {
         this.route('login', { path: '/' });
         this.route('forgot-password');

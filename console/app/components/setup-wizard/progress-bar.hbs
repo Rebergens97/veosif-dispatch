@@ -1,0 +1,42 @@
+<div class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        {{!-- Progress track --}}
+        <div class="relative">
+            <div class="overflow-hidden h-1 mb-4 text-xs flex rounded-full bg-gray-200 dark:bg-gray-700">
+                <div
+                    class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-teal-500 transition-all duration-500 ease-in-out rounded-full"
+                    style="width: {{this.progressPercent}}%"
+                ></div>
+            </div>
+
+            {{!-- Step indicators --}}
+            <div class="flex justify-between">
+                {{#each this.stepsWithStatus as |step|}}
+                    <button
+                        type="button"
+                        class="flex flex-col items-center group {{if step.isClickable 'cursor-pointer' 'cursor-default'}}"
+                        disabled={{not step.isClickable}}
+                        {{on "click" (fn this.handleStepClick step)}}
+                    >
+                        <div class="flex items-center justify-center w-8 h-8 rounded-full text-xs font-semibold transition-all duration-200
+                            {{if step.isCompleted 'bg-teal-500 text-white'
+                                (if step.isCurrent 'bg-teal-500 text-white ring-4 ring-teal-100 dark:ring-teal-900'
+                                    'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400')}}">
+                            {{#if step.isCompleted}}
+                                <FaIcon @icon="check" @size="xs" />
+                            {{else}}
+                                {{add step.index 1}}
+                            {{/if}}
+                        </div>
+                        <span class="mt-1 text-xs font-medium hidden sm:block
+                            {{if step.isCurrent 'text-teal-600 dark:text-teal-400'
+                                (if step.isCompleted 'text-gray-700 dark:text-gray-300'
+                                    'text-gray-400 dark:text-gray-500')}}">
+                            {{step.label}}
+                        </span>
+                    </button>
+                {{/each}}
+            </div>
+        </div>
+    </div>
+</div>

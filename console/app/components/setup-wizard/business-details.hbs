@@ -1,0 +1,114 @@
+<div class="max-w-2xl mx-auto">
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Business Details</h2>
+        <p class="text-gray-500 dark:text-gray-400 mt-1">Tell us about your organization so we can tailor your workspace.</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow rounded-xl p-6 space-y-5">
+        {{!-- Company Name --}}
+        <InputGroup
+            @name="Company Name"
+            @value={{this.companyName}}
+            @helpText="Your organization or business name"
+            @inputClass="input-lg"
+            @onInput={{fn this.updateField "companyName"}}
+        />
+
+        {{!-- Business Type --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Business Type</label>
+            <select
+                class="form-input input-lg w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md"
+                {{on "change" (fn this.updateField "businessType")}}
+            >
+                <option value="" selected={{not this.businessType}}>Select your business type...</option>
+                {{#each this.businessTypes as |bt|}}
+                    <option value={{bt.value}} selected={{eq this.businessType bt.value}}>{{bt.label}}</option>
+                {{/each}}
+            </select>
+        </div>
+
+        {{!-- Email --}}
+        <InputGroup
+            @name="Business Email"
+            @type="email"
+            @value={{this.businessEmail}}
+            @helpText="Primary contact email for your organization"
+            @inputClass="input-lg"
+            @onInput={{fn this.updateField "businessEmail"}}
+        />
+
+        {{!-- Phone --}}
+        <InputGroup @name="Phone Number" @helpText="Business phone number">
+            <PhoneInput @value={{this.businessPhone}} @onInput={{fn (mut this.businessPhone)}} class="form-input input-lg w-full" />
+        </InputGroup>
+
+        {{!-- Country --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Country</label>
+            <select
+                class="form-input input-lg w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md"
+                {{on "change" (fn this.updateField "country")}}
+            >
+                <option value="" selected={{not this.country}}>Select country...</option>
+                {{#each this.countries as |c|}}
+                    <option value={{c.value}} selected={{eq this.country c.value}}>{{c.label}}</option>
+                {{/each}}
+            </select>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {{!-- Language --}}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Preferred Language</label>
+                <select
+                    class="form-input input-lg w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-md"
+                    {{on "change" (fn this.updateField "language")}}
+                >
+                    {{#each this.languages as |lang|}}
+                        <option value={{lang.value}} selected={{eq this.language lang.value}}>{{lang.label}}</option>
+                    {{/each}}
+                </select>
+            </div>
+
+            {{!-- Timezone --}}
+            <InputGroup
+                @name="Timezone"
+                @value={{this.timezone}}
+                @helpText="Auto-detected"
+                @inputClass="input-lg"
+                @onInput={{fn this.updateField "timezone"}}
+            />
+        </div>
+
+        {{!-- Errors --}}
+        {{#if this.errors.length}}
+            <div class="rounded-md bg-red-50 dark:bg-red-900/20 p-3">
+                <ul class="list-disc list-inside text-sm text-red-700 dark:text-red-400">
+                    {{#each this.errors as |err|}}
+                        <li>{{err}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+        {{/if}}
+    </div>
+
+    {{!-- Navigation --}}
+    <div class="flex items-center justify-between mt-6">
+        <Button
+            @type="default"
+            @icon="arrow-left"
+            @iconPrefix="fas"
+            @text="Back"
+            @onClick={{this.goBack}}
+        />
+        <Button
+            @type="primary"
+            @icon="arrow-right"
+            @iconPrefix="fas"
+            @text="Save & Continue"
+            @onClick={{this.continueSetup}}
+            @disabled={{not this.filled}}
+        />
+    </div>
+</div>

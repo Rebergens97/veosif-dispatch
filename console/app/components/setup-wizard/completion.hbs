@@ -1,0 +1,158 @@
+{{#if this.isComplete}}
+    {{!-- Success Screen --}}
+    <div class="max-w-lg mx-auto text-center py-12">
+        <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
+            <FaIcon @icon="check-circle" @size="2x" class="text-teal-500" />
+        </div>
+
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">Your workspace is ready!</h1>
+        <p class="text-lg text-gray-500 dark:text-gray-400 mb-2">
+            {{or this.branding.displayName this.businessDetails.companyName "Your workspace"}} has been set up.
+        </p>
+
+        {{#if this.subscription.isTrial}}
+            <div class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 mb-6">
+                <FaIcon @icon="clock" @size="xs" class="mr-1" />
+                14-day free trial active
+            </div>
+        {{/if}}
+
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 mb-8 text-left">
+            <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Summary</h3>
+            <dl class="space-y-3">
+                <div class="flex justify-between">
+                    <dt class="text-sm text-gray-500 dark:text-gray-400">Workspace</dt>
+                    <dd class="text-sm font-medium text-gray-900 dark:text-white">{{or this.businessDetails.companyName "—"}}</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm text-gray-500 dark:text-gray-400">Plan</dt>
+                    <dd class="text-sm font-medium text-gray-900 dark:text-white">{{this.planName}} ({{this.billingLabel}})</dd>
+                </div>
+                <div class="flex justify-between">
+                    <dt class="text-sm text-gray-500 dark:text-gray-400">Business type</dt>
+                    <dd class="text-sm font-medium text-gray-900 dark:text-white">{{or this.businessDetails.businessType "—"}}</dd>
+                </div>
+            </dl>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Button
+                @type="primary"
+                @size="lg"
+                @icon="tachometer-alt"
+                @iconPrefix="fas"
+                @text="Go to Dashboard"
+                @onClick={{this.goToDashboard}}
+            />
+        </div>
+    </div>
+{{else}}
+    {{!-- Review Screen --}}
+    <div class="max-w-2xl mx-auto">
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Review & Complete</h2>
+            <p class="text-gray-500 dark:text-gray-400 mt-1">Review your setup before we create your workspace.</p>
+        </div>
+
+        <div class="space-y-4">
+            {{!-- Business Details --}}
+            <div class="bg-white dark:bg-gray-800 shadow rounded-xl p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">Business Details</h3>
+                    <button type="button" class="text-sm text-teal-600 dark:text-teal-400 hover:underline" {{on "click" (fn this.editStep "business-details")}}>
+                        Edit
+                    </button>
+                </div>
+                <dl class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <dt class="text-gray-500 dark:text-gray-400">Company</dt>
+                        <dd class="font-medium text-gray-900 dark:text-white">{{or this.businessDetails.companyName "—"}}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-gray-500 dark:text-gray-400">Type</dt>
+                        <dd class="font-medium text-gray-900 dark:text-white">{{or this.businessDetails.businessType "—"}}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-gray-500 dark:text-gray-400">Email</dt>
+                        <dd class="font-medium text-gray-900 dark:text-white">{{or this.businessDetails.businessEmail "—"}}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-gray-500 dark:text-gray-400">Phone</dt>
+                        <dd class="font-medium text-gray-900 dark:text-white">{{or this.businessDetails.businessPhone "—"}}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-gray-500 dark:text-gray-400">Country</dt>
+                        <dd class="font-medium text-gray-900 dark:text-white">{{or this.businessDetails.country "—"}}</dd>
+                    </div>
+                    <div>
+                        <dt class="text-gray-500 dark:text-gray-400">Language</dt>
+                        <dd class="font-medium text-gray-900 dark:text-white">{{or this.businessDetails.language "—"}}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            {{!-- Branding --}}
+            <div class="bg-white dark:bg-gray-800 shadow rounded-xl p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">Branding</h3>
+                    <button type="button" class="text-sm text-teal-600 dark:text-teal-400 hover:underline" {{on "click" (fn this.editStep "branding")}}>
+                        Edit
+                    </button>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white text-sm font-bold" style="background-color: {{or this.branding.primaryColor '#14b8a6'}}">
+                        {{or this.branding.brandInitials "?"}}
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{or this.branding.displayName "Not set"}}</p>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <div class="w-4 h-4 rounded border border-gray-200 dark:border-gray-600" style="background-color: {{or this.branding.primaryColor '#14b8a6'}}"></div>
+                            <div class="w-4 h-4 rounded border border-gray-200 dark:border-gray-600" style="background-color: {{or this.branding.secondaryColor '#0f172a'}}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{!-- Plan --}}
+            <div class="bg-white dark:bg-gray-800 shadow rounded-xl p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">Plan</h3>
+                    <button type="button" class="text-sm text-teal-600 dark:text-teal-400 hover:underline" {{on "click" (fn this.editStep "plan-selection")}}>
+                        Edit
+                    </button>
+                </div>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="font-medium text-gray-900 dark:text-white">{{this.planName}}</span>
+                    <span class="text-gray-500 dark:text-gray-400">{{this.billingLabel}}{{if this.subscription.isTrial " · 14-day trial" ""}}</span>
+                </div>
+            </div>
+        </div>
+
+        {{!-- Error --}}
+        {{#if this.error}}
+            <div class="mt-4 rounded-md bg-red-50 dark:bg-red-900/20 p-3">
+                <p class="text-sm text-red-700 dark:text-red-400">{{this.error}}</p>
+            </div>
+        {{/if}}
+
+        {{!-- Navigation --}}
+        <div class="flex items-center justify-between mt-6">
+            <Button
+                @type="default"
+                @icon="arrow-left"
+                @iconPrefix="fas"
+                @text="Back"
+                @onClick={{this.goBack}}
+            />
+            <Button
+                @type="primary"
+                @icon="check"
+                @iconPrefix="fas"
+                @size="lg"
+                @text="Complete Setup"
+                @onClick={{perform this.completeSetup}}
+                @isLoading={{this.completeSetup.isRunning}}
+            />
+        </div>
+    </div>
+{{/if}}

@@ -1,0 +1,112 @@
+<div class="max-w-2xl mx-auto">
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Branding</h2>
+        <p class="text-gray-500 dark:text-gray-400 mt-1">Customize how your workspace looks. You can always change this later.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        {{!-- Form --}}
+        <div class="lg:col-span-3 bg-white dark:bg-gray-800 shadow rounded-xl p-6 space-y-5">
+            <InputGroup
+                @name="Display Name"
+                @value={{this.displayName}}
+                @helpText="Shown in the sidebar and navigation"
+                @inputClass="input-lg"
+                @onInput={{fn this.updateField "displayName"}}
+            />
+
+            <InputGroup
+                @name="Brand Initials"
+                @value={{this.brandInitials}}
+                @helpText="Used as avatar when no logo is set (max 2 characters)"
+                @inputClass="input-lg"
+                @onInput={{fn this.updateField "brandInitials"}}
+            />
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Primary Color</label>
+                    <div class="flex items-center space-x-3">
+                        <input
+                            type="color"
+                            value={{this.primaryColor}}
+                            class="w-10 h-10 rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer"
+                            {{on "input" (fn this.updateColor "primaryColor")}}
+                        />
+                        <span class="text-sm text-gray-600 dark:text-gray-400 font-mono">{{this.primaryColor}}</span>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Secondary Color</label>
+                    <div class="flex items-center space-x-3">
+                        <input
+                            type="color"
+                            value={{this.secondaryColor}}
+                            class="w-10 h-10 rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer"
+                            {{on "input" (fn this.updateColor "secondaryColor")}}
+                        />
+                        <span class="text-sm text-gray-600 dark:text-gray-400 font-mono">{{this.secondaryColor}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{!-- Live Preview --}}
+        <div class="lg:col-span-2">
+            <div class="bg-white dark:bg-gray-800 shadow rounded-xl p-4">
+                <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3 uppercase tracking-wider">Preview</p>
+
+                {{!-- Sidebar mock --}}
+                <div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                    <div class="p-3 flex items-center space-x-3" style="background-color: {{this.secondaryColor}}">
+                        {{#if this.logoUrl}}
+                            <img src={{this.logoUrl}} alt="" class="w-8 h-8 rounded object-contain" />
+                        {{else}}
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold" style="background-color: {{this.primaryColor}}">
+                                {{this.brandInitials}}
+                            </div>
+                        {{/if}}
+                        <span class="text-sm font-semibold text-white truncate">{{or this.displayName "Your Company"}}</span>
+                    </div>
+                    <div class="p-3 space-y-2" style="background-color: {{this.secondaryColor}}; opacity: 0.85">
+                        <div class="h-2 w-3/4 rounded-full bg-white/20"></div>
+                        <div class="h-2 w-1/2 rounded-full bg-white/20"></div>
+                        <div class="h-2 w-2/3 rounded-full bg-white/20"></div>
+                    </div>
+                </div>
+
+                {{!-- Badge mock --}}
+                <div class="mt-3 flex items-center space-x-2">
+                    <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium text-white" style="background-color: {{this.primaryColor}}">
+                        {{or this.displayName "Company"}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{!-- Navigation --}}
+    <div class="flex items-center justify-between mt-6">
+        <Button
+            @type="default"
+            @icon="arrow-left"
+            @iconPrefix="fas"
+            @text="Back"
+            @onClick={{this.goBack}}
+        />
+        <div class="flex items-center space-x-3">
+            <Button
+                @type="default"
+                @text="Skip"
+                @onClick={{this.skipStep}}
+            />
+            <Button
+                @type="primary"
+                @icon="arrow-right"
+                @iconPrefix="fas"
+                @text="Save & Continue"
+                @onClick={{this.continueSetup}}
+            />
+        </div>
+    </div>
+</div>

@@ -1,0 +1,71 @@
+<div class="max-w-2xl mx-auto text-center">
+    {{!-- Hero --}}
+    <div class="mb-8">
+        {{#if @brand.logo_url}}
+            <Image src={{@brand.logo_url}} @fallbackSrc="/images/fleetbase-logo-svg.svg" alt="VEOSIF Dispatch" class="h-16 mx-auto mb-4 object-contain" />
+        {{else}}
+            <div class="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center shadow-lg">
+                <span class="text-3xl font-bold text-white">V</span>
+            </div>
+        {{/if}}
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Welcome to VEOSIF Dispatch
+        </h1>
+        <p class="text-lg text-gray-500 dark:text-gray-400">
+            Set up your dispatch workspace in a few simple steps.
+        </p>
+    </div>
+
+    {{!-- Mode Selection --}}
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+        {{!-- Start from scratch --}}
+        <button
+            type="button"
+            class="relative p-6 rounded-xl border-2 text-left transition-all duration-200 hover:shadow-md
+                {{if (eq this.selectedMode 'scratch')
+                    'border-teal-500 bg-teal-50 dark:bg-teal-900/20 shadow-md'
+                    'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'}}"
+            {{on "click" (fn this.selectMode "scratch")}}
+        >
+            {{#if (eq this.selectedMode "scratch")}}
+                <div class="absolute top-3 right-3">
+                    <div class="w-6 h-6 rounded-full bg-teal-500 flex items-center justify-center">
+                        <FaIcon @icon="check" @size="xs" class="text-white" />
+                    </div>
+                </div>
+            {{/if}}
+            <div class="w-12 h-12 rounded-xl bg-teal-100 dark:bg-teal-800 flex items-center justify-center mb-3">
+                <FaIcon @icon="rocket" @size="lg" class="text-teal-600 dark:text-teal-400" />
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">Start from scratch</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Configure everything yourself. Perfect for new organizations.</p>
+        </button>
+
+        {{!-- Import data (coming soon) --}}
+        <div class="relative p-6 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 text-left opacity-60 cursor-not-allowed">
+            <div class="absolute top-3 right-3">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
+                    Coming soon
+                </span>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-gray-200 dark:bg-gray-700 flex items-center justify-center mb-3">
+                <FaIcon @icon="file-import" @size="lg" class="text-gray-400 dark:text-gray-500" />
+            </div>
+            <h3 class="text-lg font-semibold text-gray-500 dark:text-gray-400 mb-1">Import existing data</h3>
+            <p class="text-sm text-gray-400 dark:text-gray-500">Import your drivers, vehicles, and orders from a file.</p>
+        </div>
+    </div>
+
+    {{!-- Continue --}}
+    <div class="flex items-center justify-center">
+        <Button
+            @type="primary"
+            @size="lg"
+            @icon="arrow-right"
+            @iconPrefix="fas"
+            @text="Get Started"
+            @onClick={{this.continueSetup}}
+            @wrapperClass="min-w-48"
+        />
+    </div>
+</div>

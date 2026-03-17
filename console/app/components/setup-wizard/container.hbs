@@ -1,0 +1,31 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    {{!-- Header --}}
+    <div class="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                {{#if @brand.logo_url}}
+                    <Image src={{@brand.logo_url}} @fallbackSrc="/images/fleetbase-logo-svg.svg" alt="VEOSIF Dispatch" class="h-8 object-contain" />
+                {{else}}
+                    <span class="text-xl font-bold text-teal-600 dark:text-teal-400">VEOSIF Dispatch</span>
+                {{/if}}
+                <span class="text-sm text-gray-500 dark:text-gray-400">Workspace Setup</span>
+            </div>
+            <div class="text-sm text-gray-500 dark:text-gray-400">
+                Step {{this.setup.currentStepIndex}} of {{this.setup.totalSteps}}
+            </div>
+        </div>
+    </div>
+
+    {{!-- Progress Bar --}}
+    <SetupWizard::ProgressBar
+        @steps={{this.setup.steps}}
+        @currentStep={{this.setup.currentStep}}
+        @completedSteps={{this.setup.completedSteps}}
+        @onStepClick={{this.goToStep}}
+    />
+
+    {{!-- Step Content --}}
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {{component this.currentComponent brand=@brand}}
+    </div>
+</div>

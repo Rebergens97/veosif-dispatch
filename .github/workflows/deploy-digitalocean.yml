@@ -48,6 +48,12 @@ jobs:
               exit 1
             fi
 
+            echo "--- Updating Nginx configs ---"
+            cp scripts/nginx/api.conf /etc/nginx/sites-available/api.veosifwork.com 2>/dev/null || true
+            cp scripts/nginx/console.conf /etc/nginx/sites-available/veosifwork.com 2>/dev/null || true
+            cp scripts/nginx/socket.conf /etc/nginx/sites-available/socket.veosifwork.com 2>/dev/null || true
+            nginx -t && systemctl reload nginx || true
+
             echo "--- Building Docker images ---"
             docker compose -f docker-compose.yml -f docker-compose.production.yml build console httpd
 

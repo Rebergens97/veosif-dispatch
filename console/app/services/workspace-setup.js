@@ -269,6 +269,28 @@ export default class WorkspaceSetupService extends Service {
             localStorage.setItem('veosif_setup_completed', '1');
             this.resetProgress();
             this.notifications.success('Your workspace is ready!');
+
+            // Send welcome email in background (non-blocking)
+            try {
+                const bd = this.data.businessDetails || {};
+                const sub = this.data.subscription || {};
+                const userEmail = this.currentUser?.user?.email;
+                const userName = this.currentUser?.user?.name;
+                if (userEmail) {
+                    this.fetch.post('onboarding/welcome-email', {
+                        email: userEmail,
+                        name: userName || bd.companyName || 'User',
+                        company_name: bd.companyName || '',
+                        plan_id: sub.planId || 'starter',
+                        billing_cycle: sub.billingCycle || 'monthly',
+                        is_trial: sub.isTrial || false,
+                    }).catch(() => {
+                        // Silently ignore email errors
+                    });
+                }
+            } catch (e) {
+                // Silently ignore
+            }
         } catch (error) {
             this.notifications.serverError(error, 'Setup failed. Please try again.');
             throw error;

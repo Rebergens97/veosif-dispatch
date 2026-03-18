@@ -6,14 +6,17 @@ export default class SetupRoute extends Route {
     @service session;
     @service store;
     @service('workspace-setup') workspaceSetup;
-    @service currentUser;
 
     async beforeModel(transition) {
         await this.session.requireAuthentication(transition, 'auth.login');
     }
 
-    model() {
+    async model() {
+        this.workspaceSetup.loadProgress();
+        return this.store.findRecord('brand', 1).catch(() => null);
+    }
+
+    afterModel() {
         removeBootLoader();
-        return null;
     }
 }

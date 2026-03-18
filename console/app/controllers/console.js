@@ -9,6 +9,7 @@ import first from '@fleetbase/ember-core/utils/first';
 
 export default class ConsoleController extends Controller {
     @service currentUser;
+    @service('workspace-setup') workspaceSetup;
     @service modalsManager;
     @service session;
     @service fetch;

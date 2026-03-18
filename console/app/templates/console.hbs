@@ -1,4 +1,12 @@
 {{page-title (t "app.name")}}
+
+{{!-- Setup Wizard Overlay --}}
+{{#if this.workspaceSetup.shouldShow}}
+    <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;overflow-y:auto;">
+        <SetupWizard::Container @brand={{@model}} />
+    </div>
+{{/if}}
+
 <Layout::Container>
     <Layout::Header
         @brand={{@model}}

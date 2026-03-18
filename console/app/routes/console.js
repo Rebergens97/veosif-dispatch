@@ -6,6 +6,7 @@ import '@fleetbase/leaflet-routing-machine';
 
 export default class ConsoleRoute extends Route {
     @service('universe/hook-service') hookService;
+    @service('workspace-setup') workspaceSetup;
     @service store;
     @service session;
     @service router;
@@ -27,11 +28,13 @@ export default class ConsoleRoute extends Route {
         if (this.session.isAuthenticated) {
             await this.session.promiseCurrentUser(transition);
 
-            // Redirect to setup wizard if workspace onboarding is not completed
+            // Show setup wizard overlay if workspace onboarding is not completed
             try {
                 const user = this.currentUser?.user;
                 if (user && !user.company_onboarding_completed) {
-                    return this.router.transitionTo('setup');
+                    this.workspaceSetup.shouldShow = true;
+                    this.workspaceSetup.loadProgress();
+                    this.workspaceSetup.prefillFromUser();
                 }
             } catch (e) {
                 // Silently continue to console if check fails

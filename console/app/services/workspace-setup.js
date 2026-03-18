@@ -52,6 +52,7 @@ export default class WorkspaceSetupService extends Service {
     @tracked isLoading = false;
     @tracked isSaving = false;
     @tracked isFinalized = false;
+    @tracked shouldShow = false;
 
     get steps() {
         return STEPS;
@@ -261,6 +262,7 @@ export default class WorkspaceSetupService extends Service {
             }
 
             this.isFinalized = true;
+            this.shouldShow = false;
             this.resetProgress();
             this.notifications.success('Your workspace is ready!');
         } catch (error) {

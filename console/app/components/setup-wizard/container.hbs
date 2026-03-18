@@ -26,6 +26,16 @@
 
     {{!-- Step Content --}}
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {{component this.currentComponent brand=@brand}}
+        {{#if (eq this.setup.currentStep "welcome")}}
+            <SetupWizard::Welcome @brand={{@brand}} />
+        {{else if (eq this.setup.currentStep "business-details")}}
+            <SetupWizard::BusinessDetails @brand={{@brand}} />
+        {{else if (eq this.setup.currentStep "branding")}}
+            <SetupWizard::Branding @brand={{@brand}} />
+        {{else if (eq this.setup.currentStep "plan-selection")}}
+            <SetupWizard::PlanSelection @brand={{@brand}} />
+        {{else if (eq this.setup.currentStep "completion")}}
+            <SetupWizard::Completion @brand={{@brand}} />
+        {{/if}}
     </div>
 </div>

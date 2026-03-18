@@ -30,7 +30,7 @@ export default class ConsoleRoute extends Route {
             // Redirect to setup wizard if workspace onboarding is not completed
             try {
                 const user = this.currentUser?.user;
-                if (user && user.company_onboarding_completed === false) {
+                if (user && !user.company_onboarding_completed) {
                     return this.router.transitionTo('setup');
                 }
             } catch (e) {

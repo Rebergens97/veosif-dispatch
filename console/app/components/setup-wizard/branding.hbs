@@ -7,6 +7,35 @@
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {{!-- Form --}}
         <div class="lg:col-span-3 bg-white dark:bg-gray-800 shadow rounded-xl p-6 space-y-5">
+            {{!-- Logo Upload --}}
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Company Logo</label>
+                <div class="flex items-center space-x-4">
+                    {{#if this.logoUrl}}
+                        <img src={{this.logoUrl}} alt="Logo" class="h-14 w-auto rounded-lg border border-gray-200 dark:border-gray-600 object-contain p-1" />
+                        <button type="button" class="text-xs text-red-500 hover:text-red-700" {{on "click" this.removeLogo}}>
+                            Remove
+                        </button>
+                    {{else}}
+                        <div class="h-14 w-24 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center">
+                            <FaIcon @icon="image" class="text-gray-400 dark:text-gray-500 text-xl" />
+                        </div>
+                    {{/if}}
+                    <FileUpload @name="logo" @accept="image/*" @onFileAdded={{this.uploadLogo}} @labelClass="mb-0">
+                        <a class="flex items-center px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer no-underline">
+                            {{#if this.isUploadingLogo}}
+                                <Spinner class="mr-1.5 w-3 h-3" />
+                                Uploading...
+                            {{else}}
+                                <FaIcon @icon="upload" @size="xs" class="mr-1.5" />
+                                Upload Logo
+                            {{/if}}
+                        </a>
+                    </FileUpload>
+                </div>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">PNG, JPG, SVG — max 2MB</p>
+            </div>
+
             <InputGroup
                 @name="Display Name"
                 @value={{this.displayName}}
@@ -60,7 +89,7 @@
                 <div class="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                     <div class="p-3 flex items-center space-x-3" style="background-color: {{this.secondaryColor}}">
                         {{#if this.logoUrl}}
-                            <img src={{this.logoUrl}} alt="" class="w-8 h-8 rounded object-contain" />
+                            <img src={{this.logoUrl}} alt="logo" class="w-8 h-8 rounded object-contain bg-white/10 p-0.5" />
                         {{else}}
                             <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold" style="background-color: {{this.primaryColor}}">
                                 {{this.brandInitials}}

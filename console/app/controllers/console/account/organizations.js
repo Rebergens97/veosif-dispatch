@@ -162,26 +162,25 @@ export default class ConsoleAccountOrganizationsController extends Controller {
         return this.currentUser?.user?.type === 'admin';
     }
 
-    get ownedOrganizationsCount() {
-        const userId = this.currentUser?.id;
-        return (this.model || []).filter((org) => org.owner_uuid === userId).length;
-    }
-
-    @action createOrganization() {
+    @action async createOrganization() {
         // Enforce 1 organization limit for non-admin users
-        if (!this.isSuperAdmin && this.ownedOrganizationsCount >= 1) {
-            this.modalsManager.confirm({
-                title: 'Organization Limit Reached',
-                body: 'Your current plan includes 1 organization. To create additional organizations, please upgrade your plan or contact support.',
-                acceptButtonText: 'Contact Support',
-                declineButtonText: 'Cancel',
-                acceptButtonIcon: 'envelope',
-                confirm: (modal) => {
-                    modal.done();
-                    window.open('mailto:support@veosifwork.com?subject=Additional Organization Request', '_blank');
-                },
-            });
-            return;
+        if (!this.isSuperAdmin) {
+            const userId = this.currentUser?.id;
+            const ownedCount = (this.model || []).filter((org) => org.owner_uuid === userId || org.owner_id === userId).length;
+            if (ownedCount >= 1) {
+                this.modalsManager.confirm({
+                    title: 'Organization Limit Reached',
+                    body: 'Your current plan includes 1 organization. To create additional organizations, please upgrade your plan or contact support.',
+                    acceptButtonText: 'Contact Support',
+                    declineButtonText: 'Cancel',
+                    acceptButtonIcon: 'envelope',
+                    confirm: (modal) => {
+                        modal.done();
+                        window.open('mailto:support@veosifwork.com?subject=Additional Organization Request', '_blank');
+                    },
+                });
+                return;
+            }
         }
 
         const currency = this.currentUser.currency;

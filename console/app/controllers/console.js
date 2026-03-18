@@ -35,15 +35,6 @@ export default class ConsoleController extends Controller {
         return this.currentUser?.user?.type === 'admin';
     }
 
-    get ownedOrganizationsCount() {
-        const userId = this.currentUser?.id;
-        return this.organizations.filter((org) => org.owner_uuid === userId).length;
-    }
-
-    get canCreateOrganization() {
-        return this.isSuperAdmin || this.ownedOrganizationsCount === 0;
-    }
-
     constructor() {
         super(...arguments);
         this.router.on('routeDidChange', (transition) => {
@@ -132,24 +123,33 @@ export default class ConsoleController extends Controller {
      *
      * @void
      */
-    @action createOrJoinOrg() {
+    @action async createOrJoinOrg() {
         const currency = this.currentUser.currency;
         const country = this.currentUser.country;
 
         // Enforce 1 organization limit for non-admin users
-        if (!this.canCreateOrganization) {
-            this.modalsManager.confirm({
-                title: 'Organization Limit Reached',
-                body: 'Your current plan includes 1 organization. To create additional organizations, please upgrade your plan or contact support.',
-                acceptButtonText: 'Contact Support',
-                declineButtonText: 'Cancel',
-                acceptButtonIcon: 'envelope',
-                confirm: (modal) => {
-                    modal.done();
-                    window.open('mailto:support@veosifwork.com?subject=Additional Organization Request', '_blank');
-                },
-            });
-            return;
+        if (!this.isSuperAdmin) {
+            try {
+                const orgs = await this.fetch.get('auth/organizations');
+                const userId = this.currentUser?.id;
+                const ownedCount = (orgs || []).filter((org) => org.owner_uuid === userId || org.owner_id === userId).length;
+                if (ownedCount >= 1) {
+                    this.modalsManager.confirm({
+                        title: 'Organization Limit Reached',
+                        body: 'Your current plan includes 1 organization. To create additional organizations, please upgrade your plan or contact support.',
+                        acceptButtonText: 'Contact Support',
+                        declineButtonText: 'Cancel',
+                        acceptButtonIcon: 'envelope',
+                        confirm: (modal) => {
+                            modal.done();
+                            window.open('mailto:support@veosifwork.com?subject=Additional Organization Request', '_blank');
+                        },
+                    });
+                    return;
+                }
+            } catch (e) {
+                // If check fails, allow creation to proceed
+            }
         }
 
         this.modalsManager.show('modals/create-or-join-org', {

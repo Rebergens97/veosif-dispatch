@@ -195,37 +195,22 @@ export default class ConsoleAdminOrganizationsController extends Controller {
     }
 
     /**
-     * Activate an organization.
-     *
-     * @param {CompanyModel} company
-     */
-    @action async activateOrganization(company) {
-        try {
-            await this.fetch.patch(`companies/${company.id}`, { status: 'active' });
-            company.set('status', 'active');
-            this.notifications.success(`${company.name} has been activated.`);
-        } catch (error) {
-            this.notifications.serverError(error);
-        }
-    }
-
-    /**
-     * Deactivate an organization.
+     * Deactivate an organization and all its users.
      *
      * @param {CompanyModel} company
      */
     @action deactivateOrganization(company) {
         this.modalsManager.confirm({
             title: 'Deactivate Organization',
-            body: `Are you sure you want to deactivate ${company.name}? All users in this organization will lose access.`,
+            body: `Are you sure you want to deactivate ${company.name}? All users in this organization will also be deactivated and lose access.`,
             acceptButtonText: 'Deactivate',
             acceptButtonScheme: 'danger',
             confirm: async (modal) => {
                 modal.startLoading();
                 try {
-                    await this.fetch.patch(`companies/${company.id}`, { status: 'inactive' });
+                    await this.fetch.patch(`companies/${company.id}`, { status: 'inactive', deactivate_users: true });
                     company.set('status', 'inactive');
-                    this.notifications.warning(`${company.name} has been deactivated.`);
+                    this.notifications.warning(`${company.name} and all its users have been deactivated.`);
                     modal.done();
                 } catch (error) {
                     modal.stopLoading();
@@ -233,5 +218,20 @@ export default class ConsoleAdminOrganizationsController extends Controller {
                 }
             },
         });
+    }
+
+    /**
+     * Activate an organization and all its users.
+     *
+     * @param {CompanyModel} company
+     */
+    @action async activateOrganization(company) {
+        try {
+            await this.fetch.patch(`companies/${company.id}`, { status: 'active', activate_users: true });
+            company.set('status', 'active');
+            this.notifications.success(`${company.name} and all its users have been activated.`);
+        } catch (error) {
+            this.notifications.serverError(error);
+        }
     }
 }

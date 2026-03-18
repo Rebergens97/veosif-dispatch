@@ -242,6 +242,7 @@ export default class WorkspaceSetupService extends Service {
 
                 const opts = company.options || {};
                 opts.setupMode = this.data.setupMode;
+                opts.onboarding_completed = true;
                 opts.branding = {
                     displayName: br.displayName,
                     primaryColor: br.primaryColor,

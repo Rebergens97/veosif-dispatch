@@ -30,7 +30,11 @@ export default class ConsoleRoute extends Route {
 
             // Show setup wizard overlay if not yet completed
             try {
-                const isCompleted = localStorage.getItem('veosif_setup_completed') === '1';
+                const localCompleted = localStorage.getItem('veosif_setup_completed') === '1';
+                const user = this.currentUser?.user;
+                const companyOptions = user?.company?.options || {};
+                const backendCompleted = companyOptions.onboarding_completed === true || user?.company_onboarding_completed === true;
+                const isCompleted = localCompleted || backendCompleted;
                 if (!isCompleted) {
                     this.workspaceSetup.shouldShow = true;
                     this.workspaceSetup.loadProgress();

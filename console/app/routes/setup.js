@@ -12,31 +12,8 @@ export default class SetupRoute extends Route {
         await this.session.requireAuthentication(transition, 'auth.login');
     }
 
-    async model() {
-        try {
-            this.workspaceSetup.loadProgress();
-        } catch (e) {
-            // ignore
-        }
-        try {
-            this.workspaceSetup.prefillFromUser();
-        } catch (e) {
-            // ignore
-        }
-        let brand = null;
-        try {
-            brand = await this.store.findRecord('brand', 1);
-        } catch (e) {
-            // ignore
-        }
-        return brand;
-    }
-
-    afterModel() {
-        try {
-            removeBootLoader();
-        } catch (e) {
-            // ignore
-        }
+    model() {
+        removeBootLoader();
+        return null;
     }
 }

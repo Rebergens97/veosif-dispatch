@@ -28,10 +28,10 @@ export default class ConsoleRoute extends Route {
         if (this.session.isAuthenticated) {
             await this.session.promiseCurrentUser(transition);
 
-            // Show setup wizard overlay if workspace onboarding is not completed
+            // Show setup wizard overlay if not yet completed
             try {
-                const user = this.currentUser?.user;
-                if (user && !user.company_onboarding_completed) {
+                const isCompleted = localStorage.getItem('veosif_setup_completed') === '1';
+                if (!isCompleted) {
                     this.workspaceSetup.shouldShow = true;
                     this.workspaceSetup.loadProgress();
                     this.workspaceSetup.prefillFromUser();

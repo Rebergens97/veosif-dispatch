@@ -2,7 +2,7 @@
 
 {{!-- Setup Wizard Overlay --}}
 {{#if this.workspaceSetup.shouldShow}}
-    <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;overflow-y:auto;">
+    <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:9999;overflow-y:auto;background:#f9fafb;">
         <SetupWizard::Container @brand={{@model}} />
     </div>
 {{/if}}

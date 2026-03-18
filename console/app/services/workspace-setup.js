@@ -263,6 +263,7 @@ export default class WorkspaceSetupService extends Service {
 
             this.isFinalized = true;
             this.shouldShow = false;
+            localStorage.setItem('veosif_setup_completed', '1');
             this.resetProgress();
             this.notifications.success('Your workspace is ready!');
         } catch (error) {

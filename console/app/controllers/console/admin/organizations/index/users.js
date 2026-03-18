@@ -110,6 +110,16 @@ export default class ConsoleAdminOrganizationsIndexUsersController extends Contr
                     icon: 'lock-open',
                     fn: this.changeUserPassword,
                 },
+                {
+                    label: 'Activate',
+                    icon: 'check-circle',
+                    fn: this.activateUser,
+                },
+                {
+                    label: 'Deactivate',
+                    icon: 'ban',
+                    fn: this.deactivateUser,
+                },
             ],
             sortable: false,
             filterable: false,
@@ -151,6 +161,47 @@ export default class ConsoleAdminOrganizationsIndexUsersController extends Contr
         this.modalsManager.show('modals/change-user-password', {
             keepOpen: true,
             user,
+        });
+    }
+
+    /**
+     * Activate a user account.
+     *
+     * @param {UserModel} user
+     */
+    @action async activateUser(user) {
+        try {
+            await this.fetch.patch(`users/${user.id}`, { status: 'active' });
+            user.set('status', 'active');
+            this.notifications.success(`${user.name} has been activated.`);
+        } catch (error) {
+            this.notifications.serverError(error);
+        }
+    }
+
+    /**
+     * Deactivate a user account.
+     *
+     * @param {UserModel} user
+     */
+    @action async deactivateUser(user) {
+        this.modalsManager.confirm({
+            title: 'Deactivate User',
+            body: `Are you sure you want to deactivate ${user.name}? They will no longer be able to log in.`,
+            acceptButtonText: 'Deactivate',
+            acceptButtonScheme: 'danger',
+            confirm: async (modal) => {
+                modal.startLoading();
+                try {
+                    await this.fetch.patch(`users/${user.id}`, { status: 'inactive' });
+                    user.set('status', 'inactive');
+                    this.notifications.warning(`${user.name} has been deactivated.`);
+                    modal.done();
+                } catch (error) {
+                    modal.stopLoading();
+                    this.notifications.serverError(error);
+                }
+            },
         });
     }
 

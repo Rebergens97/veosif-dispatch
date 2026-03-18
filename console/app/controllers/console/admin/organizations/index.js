@@ -15,6 +15,9 @@ export default class ConsoleAdminOrganizationsController extends Controller {
     @service router;
     @service filters;
     @service crud;
+    @service fetch;
+    @service notifications;
+    @service modalsManager;
 
     /**
      * The search query param value.
@@ -117,8 +120,46 @@ export default class ConsoleAdminOrganizationsController extends Controller {
             sortable: true,
         },
         {
+            label: this.intl.t('common.status'),
+            valuePath: 'status',
+            cellComponent: 'table/cell/status',
+            width: '120px',
+        },
+        {
             label: this.intl.t('common.created-at'),
             valuePath: 'createdAt',
+        },
+        {
+            label: '',
+            cellComponent: 'table/cell/dropdown',
+            ddButtonText: false,
+            ddButtonIcon: 'ellipsis-h',
+            ddButtonIconPrefix: 'fas',
+            ddMenuLabel: 'Organization Actions',
+            cellClassNames: 'overflow-visible',
+            wrapperClass: 'flex items-center justify-end mx-2',
+            width: '9%',
+            actions: [
+                {
+                    label: 'View Users',
+                    icon: 'users',
+                    fn: this.goToCompany,
+                },
+                {
+                    label: 'Activate',
+                    icon: 'check-circle',
+                    fn: this.activateOrganization,
+                },
+                {
+                    label: 'Deactivate',
+                    icon: 'ban',
+                    fn: this.deactivateOrganization,
+                },
+            ],
+            sortable: false,
+            filterable: false,
+            resizable: false,
+            searchable: false,
         },
     ];
 
@@ -151,5 +192,46 @@ export default class ConsoleAdminOrganizationsController extends Controller {
     @action exportOrganization() {
         const selections = this.table.selectedRows.map((_) => _.id);
         this.crud.export('companies', { params: { selections } });
+    }
+
+    /**
+     * Activate an organization.
+     *
+     * @param {CompanyModel} company
+     */
+    @action async activateOrganization(company) {
+        try {
+            await this.fetch.patch(`companies/${company.id}`, { status: 'active' });
+            company.set('status', 'active');
+            this.notifications.success(`${company.name} has been activated.`);
+        } catch (error) {
+            this.notifications.serverError(error);
+        }
+    }
+
+    /**
+     * Deactivate an organization.
+     *
+     * @param {CompanyModel} company
+     */
+    @action deactivateOrganization(company) {
+        this.modalsManager.confirm({
+            title: 'Deactivate Organization',
+            body: `Are you sure you want to deactivate ${company.name}? All users in this organization will lose access.`,
+            acceptButtonText: 'Deactivate',
+            acceptButtonScheme: 'danger',
+            confirm: async (modal) => {
+                modal.startLoading();
+                try {
+                    await this.fetch.patch(`companies/${company.id}`, { status: 'inactive' });
+                    company.set('status', 'inactive');
+                    this.notifications.warning(`${company.name} has been deactivated.`);
+                    modal.done();
+                } catch (error) {
+                    modal.stopLoading();
+                    this.notifications.serverError(error);
+                }
+            },
+        });
     }
 }

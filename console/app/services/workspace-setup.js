@@ -53,6 +53,11 @@ export default class WorkspaceSetupService extends Service {
     @tracked isSaving = false;
     @tracked isFinalized = false;
     @tracked shouldShow = false;
+    currentUserId = null;
+
+    get _storageKey() {
+        return this.currentUserId ? `veosif_setup_completed_${this.currentUserId}` : 'veosif_setup_completed';
+    }
 
     get steps() {
         return STEPS;
@@ -147,7 +152,7 @@ export default class WorkspaceSetupService extends Service {
                 completedSteps: [...this.completedSteps],
                 data: this.data,
             };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            localStorage.setItem(STORAGE_KEY + (this.currentUserId ? `_${this.currentUserId}` : ''), JSON.stringify(state));
         } catch (e) {
             // localStorage full or unavailable
         }
@@ -155,7 +160,7 @@ export default class WorkspaceSetupService extends Service {
 
     loadProgress() {
         try {
-            const raw = localStorage.getItem(STORAGE_KEY);
+            const raw = localStorage.getItem(STORAGE_KEY + (this.currentUserId ? `_${this.currentUserId}` : ''));
             if (!raw) return false;
 
             const state = JSON.parse(raw);
@@ -174,7 +179,7 @@ export default class WorkspaceSetupService extends Service {
         this.data = defaultData();
         this.isFinalized = false;
         try {
-            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(STORAGE_KEY + (this.currentUserId ? `_${this.currentUserId}` : ''));
         } catch (e) {
             // ignore
         }
@@ -266,7 +271,7 @@ export default class WorkspaceSetupService extends Service {
 
             this.isFinalized = true;
             this.shouldShow = false;
-            localStorage.setItem('veosif_setup_completed', '1');
+            localStorage.setItem(this._storageKey, '1');
             this.resetProgress();
             this.notifications.success('Your workspace is ready!');
 

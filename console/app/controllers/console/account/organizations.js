@@ -158,7 +158,32 @@ export default class ConsoleAccountOrganizationsController extends Controller {
         });
     }
 
+    get isSuperAdmin() {
+        return this.currentUser?.user?.type === 'admin';
+    }
+
+    get ownedOrganizationsCount() {
+        const userId = this.currentUser?.id;
+        return (this.model || []).filter((org) => org.owner_uuid === userId).length;
+    }
+
     @action createOrganization() {
+        // Enforce 1 organization limit for non-admin users
+        if (!this.isSuperAdmin && this.ownedOrganizationsCount >= 1) {
+            this.modalsManager.confirm({
+                title: 'Organization Limit Reached',
+                body: 'Your current plan includes 1 organization. To create additional organizations, please upgrade your plan or contact support.',
+                acceptButtonText: 'Contact Support',
+                declineButtonText: 'Cancel',
+                acceptButtonIcon: 'envelope',
+                confirm: (modal) => {
+                    modal.done();
+                    window.open('mailto:support@veosifwork.com?subject=Additional Organization Request', '_blank');
+                },
+            });
+            return;
+        }
+
         const currency = this.currentUser.currency;
         const country = this.currentUser.country;
 

@@ -2,6 +2,7 @@ import Controller from '@ember/controller';
 import { tracked } from '@glimmer/tracking';
 import { inject as service } from '@ember/service';
 import { action } from '@ember/object';
+import { later } from '@ember/runloop';
 
 /**
  * Controller for managing organizations in the admin console.
@@ -155,6 +156,11 @@ export default class ConsoleAdminOrganizationsController extends Controller {
                     icon: 'ban',
                     fn: this.deactivateOrganization,
                 },
+                {
+                    label: 'Delete Organization',
+                    icon: 'trash',
+                    fn: this.deleteOrganization,
+                },
             ],
             sortable: false,
             filterable: false,
@@ -212,6 +218,34 @@ export default class ConsoleAdminOrganizationsController extends Controller {
                     company.set('status', 'inactive');
                     this.notifications.warning(`${company.name} and all its users have been deactivated.`);
                     modal.done();
+                } catch (error) {
+                    modal.stopLoading();
+                    this.notifications.serverError(error);
+                }
+            },
+        });
+    }
+
+    /**
+     * Permanently delete an organization and all its data.
+     *
+     * @param {CompanyModel} company
+     */
+    @action deleteOrganization(company) {
+        this.modalsManager.confirm({
+            title: '⚠️ Delete Organization Permanently',
+            body: `WARNING: This will permanently delete "${company.name}" and ALL its data including users, drivers, vehicles, and orders. This action CANNOT be undone. Are you absolutely sure?`,
+            acceptButtonText: 'Yes, Delete Permanently',
+            acceptButtonScheme: 'danger',
+            acceptButtonIcon: 'trash',
+            declineButtonText: 'Cancel',
+            confirm: async (modal) => {
+                modal.startLoading();
+                try {
+                    await this.fetch.delete(`companies/${company.id}`);
+                    this.notifications.success(`${company.name} has been permanently deleted.`);
+                    modal.done();
+                    later(this, () => window.location.reload(), 800);
                 } catch (error) {
                     modal.stopLoading();
                     this.notifications.serverError(error);

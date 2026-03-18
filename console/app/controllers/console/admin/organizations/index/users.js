@@ -120,6 +120,11 @@ export default class ConsoleAdminOrganizationsIndexUsersController extends Contr
                     icon: 'ban',
                     fn: this.deactivateUser,
                 },
+                {
+                    label: 'Delete User',
+                    icon: 'trash',
+                    fn: this.deleteUser,
+                },
             ],
             sortable: false,
             filterable: false,
@@ -197,6 +202,33 @@ export default class ConsoleAdminOrganizationsIndexUsersController extends Contr
                     user.set('status', 'inactive');
                     this.notifications.warning(`${user.name} has been deactivated.`);
                     modal.done();
+                } catch (error) {
+                    modal.stopLoading();
+                    this.notifications.serverError(error);
+                }
+            },
+        });
+    }
+
+    /**
+     * Permanently delete a user account.
+     *
+     * @param {UserModel} user
+     */
+    @action deleteUser(user) {
+        this.modalsManager.confirm({
+            title: 'Delete User',
+            body: `Are you sure you want to permanently delete ${user.name} (${user.email})? This action cannot be undone.`,
+            acceptButtonText: 'Delete Permanently',
+            acceptButtonScheme: 'danger',
+            acceptButtonIcon: 'trash',
+            confirm: async (modal) => {
+                modal.startLoading();
+                try {
+                    await this.fetch.delete(`users/${user.id}`);
+                    this.notifications.success(`${user.name} has been permanently deleted.`);
+                    modal.done();
+                    later(this, () => window.location.reload(), 800);
                 } catch (error) {
                     modal.stopLoading();
                     this.notifications.serverError(error);

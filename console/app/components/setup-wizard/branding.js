@@ -48,10 +48,6 @@ export default class SetupWizardBrandingComponent extends Component {
                 this.logoUrl = uploadedFile.url;
                 this._syncToService();
                 this.isUploadingLogo = false;
-            },
-            () => {
-                this.isUploadingLogo = false;
-                this.notifications.warning('Logo upload failed. Please try again.');
             }
         );
     }

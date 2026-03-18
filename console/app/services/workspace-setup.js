@@ -258,6 +258,8 @@ export default class WorkspaceSetupService extends Service {
                 opts.language = bd.language;
                 company.set('options', { ...opts });
                 company.set('onboarding_completed', true);
+                company.set('setup_plan_id', sub.planId || null);
+                company.set('setup_billing_cycle', sub.billingCycle || 'monthly');
 
                 await company.save();
             }

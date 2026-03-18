@@ -34,6 +34,8 @@ export default class Company extends Model {
     @attr('string') status;
     @attr('string') slug;
     @attr('boolean', { defaultValue: false }) onboarding_completed;
+    @attr('string') setup_plan_id;
+    @attr('string') setup_billing_cycle;
 
     /** @dates */
     @attr('date') joined_at;

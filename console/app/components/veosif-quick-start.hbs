@@ -1,0 +1,52 @@
+<div class="p-5 h-full flex flex-col">
+    {{!-- Header --}}
+    <div class="flex items-center justify-between mb-5">
+        <div>
+            <h3 class="text-base font-semibold text-gray-900 dark:text-white">Getting Started</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Complete these steps to get the most out of {{this.companyName}}</p>
+        </div>
+        <div class="w-10 h-10 rounded-xl bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center">
+            <FaIcon @icon="rocket" class="text-teal-600 dark:text-teal-400" />
+        </div>
+    </div>
+
+    {{!-- Steps --}}
+    <div class="space-y-3 flex-1">
+        {{#each this.steps as |step|}}
+            <div
+                class="flex items-start space-x-3 p-3 rounded-lg transition-colors duration-150
+                    {{if step.done
+                        'bg-teal-50 dark:bg-teal-900/20'
+                        'bg-gray-50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer'}}"
+                role="button"
+                {{on "click" (fn this.goToRoute step)}}
+            >
+                {{!-- Icon --}}
+                <div class="flex-shrink-0 mt-0.5">
+                    {{#if step.done}}
+                        <div class="w-7 h-7 rounded-full bg-teal-500 flex items-center justify-center">
+                            <FaIcon @icon="check" @size="xs" class="text-white" />
+                        </div>
+                    {{else}}
+                        <div class="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                            <FaIcon @icon={{step.icon}} @size="xs" class="text-gray-500 dark:text-gray-400" />
+                        </div>
+                    {{/if}}
+                </div>
+
+                {{!-- Content --}}
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium {{if step.done 'text-teal-700 dark:text-teal-400 line-through' 'text-gray-900 dark:text-white'}}">
+                        {{step.label}}
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{{step.description}}</p>
+                </div>
+
+                {{!-- Arrow --}}
+                {{#unless step.done}}
+                    <FaIcon @icon="chevron-right" @size="xs" class="text-gray-400 flex-shrink-0 mt-1.5" />
+                {{/unless}}
+            </div>
+        {{/each}}
+    </div>
+</div>

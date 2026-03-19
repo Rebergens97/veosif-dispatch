@@ -33,6 +33,15 @@ export function initialize(appInstance) {
             grid_options: { w: 4, h: 9, minW: 4, minH: 9 },
             default: true,
         }),
+        new Widget({
+            id: 'veosif-inspection-report',
+            name: 'Pre-Trip Inspections',
+            description: 'Daily driver vehicle inspection reports (DVIR).',
+            icon: 'clipboard-check',
+            component: 'veosif-inspection-report',
+            grid_options: { w: 6, h: 10, minW: 6, minH: 10 },
+            default: false,
+        }),
     ];
 
     // Register widgets

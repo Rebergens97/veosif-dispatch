@@ -1,0 +1,109 @@
+<div class="p-4 h-full flex flex-col">
+    {{!-- Header --}}
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h3 class="text-base font-semibold text-gray-900 dark:text-white">Pre-Trip Inspections</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Driver Vehicle Inspection Reports</p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <input
+                type="date"
+                value={{this.selectedDate}}
+                class="text-xs border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                {{on "change" this.changeDate}}
+            />
+        </div>
+    </div>
+
+    {{!-- Stats Row --}}
+    <div class="grid grid-cols-3 gap-2 mb-4">
+        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 text-center">
+            <p class="text-xl font-bold text-blue-600 dark:text-blue-400">{{this.stats.total}}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Total</p>
+        </div>
+        <div class="bg-teal-50 dark:bg-teal-900/20 rounded-lg p-2 text-center">
+            <p class="text-xl font-bold text-teal-600 dark:text-teal-400">{{this.stats.satisfactory}}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">OK</p>
+        </div>
+        <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-2 text-center">
+            <p class="text-xl font-bold text-red-600 dark:text-red-400">{{this.stats.withDefects}}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Defects</p>
+        </div>
+    </div>
+
+    {{!-- Inspection List --}}
+    {{#if this.isLoading}}
+        <div class="flex-1 flex items-center justify-center">
+            <Spinner />
+        </div>
+    {{else if (eq this.inspections.length 0)}}
+        <div class="flex-1 flex flex-col items-center justify-center text-center">
+            <FaIcon @icon="clipboard-check" class="text-gray-300 dark:text-gray-600 text-3xl mb-2" />
+            <p class="text-sm text-gray-400 dark:text-gray-500">No inspections for this date</p>
+        </div>
+    {{else}}
+        <div class="flex-1 overflow-y-auto space-y-2">
+            {{#each this.inspections as |inspection|}}
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 bg-white dark:bg-gray-800">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            {{#if inspection.tractor_satisfactory}}
+                                <div class="w-6 h-6 rounded-full bg-teal-500 flex items-center justify-center">
+                                    <FaIcon @icon="check" @size="xs" class="text-white" />
+                                </div>
+                            {{else}}
+                                <div class="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center">
+                                    <FaIcon @icon="triangle-exclamation" @size="xs" class="text-white" />
+                                </div>
+                            {{/if}}
+                            <div>
+                                <p class="text-xs font-medium text-gray-900 dark:text-white">{{inspection.public_id}}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    {{#if inspection.inspected_at}}
+                                        {{inspection.inspected_at}}
+                                    {{else}}
+                                        No time recorded
+                                    {{/if}}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            {{#if (eq inspection.status "pending")}}
+                                <button
+                                    type="button"
+                                    class="px-2 py-1 text-xs bg-teal-500 text-white rounded-md hover:bg-teal-600"
+                                    {{on "click" (fn this.approveInspection inspection)}}
+                                >
+                                    Approve
+                                </button>
+                                <button
+                                    type="button"
+                                    class="px-2 py-1 text-xs bg-red-500 text-white rounded-md hover:bg-red-600"
+                                    {{on "click" (fn this.rejectInspection inspection)}}
+                                >
+                                    Reject
+                                </button>
+                            {{else if (eq inspection.status "approved")}}
+                                <span class="px-2 py-1 text-xs bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300 rounded-full">
+                                    ✅ Approved
+                                </span>
+                            {{else if (eq inspection.status "rejected")}}
+                                <span class="px-2 py-1 text-xs bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300 rounded-full">
+                                    ❌ Rejected
+                                </span>
+                            {{/if}}
+                        </div>
+                    </div>
+                    {{#if inspection.defects.length}}
+                        <div class="mt-2 p-2 bg-red-50 dark:bg-red-900/20 rounded text-xs text-red-700 dark:text-red-400">
+                            ⚠️ Defects: {{inspection.defects}}
+                        </div>
+                    {{/if}}
+                    {{#if inspection.remarks}}
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 italic">{{inspection.remarks}}</p>
+                    {{/if}}
+                </div>
+            {{/each}}
+        </div>
+    {{/if}}
+</div>

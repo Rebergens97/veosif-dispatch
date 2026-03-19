@@ -6,6 +6,7 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
+use App\Http\Controllers\VehicleInspectionController;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -29,6 +30,14 @@ class RouteServiceProvider extends ServiceProvider
                         );
                     }
                 );
+
+                // Vehicle Inspection (DVIR) endpoints
+                Route::middleware(['api'])->prefix('/int/v1/fleet-ops')->group(function () {
+                    Route::post('/vehicle-inspections', [VehicleInspectionController::class, 'store']);
+                    Route::get('/vehicle-inspections', [VehicleInspectionController::class, 'index']);
+                    Route::get('/vehicle-inspections/driver/{driverUuid}', [VehicleInspectionController::class, 'checkDriver']);
+                    Route::patch('/vehicle-inspections/{uuid}/status', [VehicleInspectionController::class, 'updateStatus']);
+                });
 
                 // Welcome email endpoint after workspace setup
                 Route::middleware(['api'])->post(

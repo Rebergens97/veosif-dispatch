@@ -64,7 +64,9 @@ return [
             'transport' => 'sendgrid',
         ],
 
-        'resend' => [],
+        'resend' => [
+            'transport' => 'resend',
+        ],
 
         'microsoft-graph' => [
             'transport' => 'microsoft-graph',

@@ -24,7 +24,7 @@ services:
     environment:
       SOCKETCLUSTER_WORKERS: 4
       SOCKETCLUSTER_BROKERS: 2
-      SOCKETCLUSTER_OPTIONS: '{"origins":"https://veosifwork.com:*,wss://veosifwork.com:*,https://www.veosifwork.com:*,wss://www.veosifwork.com:*"}'
+      SOCKETCLUSTER_OPTIONS: '{"origins":"*:*"}'
 
   # ---------------------------------------------------
   # Laravel Application
